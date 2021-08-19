@@ -1,0 +1,43 @@
+---
+resources:
+- name: tkg-mgmt-cluster-ctx
+  type: git
+  icon: github
+  source:
+    uri: ((github.mgmt_ctx.repo.url))
+    branch: ((github.mgmt_ctx.repo.branch))
+    username: ((github.username))
+    password: ((github.personal_access_token))
+- name: tkg-mgmt-scripts
+  type: git
+  icon: github
+  source:
+    uri: https://github.com/vmware-arcas/tkg-management-scripts
+    branch: v1.3.1
+
+jobs:
+- name: tanzu-upgrade-management-cluster
+  plan:
+  - get: tkg-mgmt-cluster-ctx
+    trigger: true
+  - get: tkg-mgmt-scripts
+    trigger: true
+  - task: upgrade-management-cluster
+    config:
+      run:
+        path: sh
+        args: ["./tkg-mgmt-scripts/upgrade-mgmt-cluster.sh"]
+      inputs:
+        - name: tkg-mgmt-cluster-ctx
+        - name: tkg-mgmt-scripts
+      params: 
+        TKG_MGMT_CLUSTER_KUBECONFIG_PATH: ./tkg-mgmt-cluster-ctx/((github.mgmt_ctx.file_name))
+        TKG_MGMT_CLUSTER_CONTEXT: ((tkg.mgmt_cluster.ctx.name))
+        TKG_MGMT_CLUSTER_NAME: ((tkg.mgmt_cluster.name))
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: 
+          repository: srinarayana/tanzu-cli-image
+          tag: 1.3.1
+      
