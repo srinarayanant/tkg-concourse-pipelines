@@ -18,7 +18,7 @@ fly -t tkg set-pipeline \
 ### Upgrade Kubernetes cluster to version 1.3.1
 command to set up kubernetes upgrade pipeline : 
 ```
-ly -t tkg set-pipeline \
+fly -t tkg set-pipeline \
     -p pipe \
     -c tkg-k8s-cluster-upgrade.yml \
     -v github.mgmt_ctx.repo.url=<<mgmt_context_github_repo_url>> \
